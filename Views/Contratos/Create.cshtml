@@ -1,0 +1,69 @@
+@model ProyectoInmobiliariaADO.Models.Contrato
+
+@{
+    ViewData["Title"] = "Nuevo Contrato";
+    var estados = new List<string> { "Vigente", "Finalizado", "Rescindido" };
+    var periodicidades = new List<string> { "Mensual", "Trimestral", "Anual" };
+}
+
+<h1>Crear Contrato</h1>
+
+<form asp-action="Create" method="post">
+    <div class="form-group">
+        <label asp-for="InmuebleId">Inmueble</label>
+        <select asp-for="InmuebleId" class="form-control" asp-items="ViewBag.Inmuebles">
+            <option value="">Seleccione un inmueble</option>
+        </select>
+        <span asp-validation-for="InmuebleId" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="InquilinoId">Inquilino</label>
+        <select asp-for="InquilinoId" class="form-control" asp-items="ViewBag.Inquilinos">
+            <option value="">Seleccione un inquilino</option>
+        </select>
+        <span asp-validation-for="InquilinoId" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="FechaInicio"></label>
+        <input asp-for="FechaInicio" type="date" class="form-control" />
+        <span asp-validation-for="FechaInicio" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="FechaFin"></label>
+        <input asp-for="FechaFin" type="date" class="form-control" />
+        <span asp-validation-for="FechaFin" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Monto"></label>
+        <input asp-for="Monto" class="form-control" />
+        <span asp-validation-for="Monto" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Periodicidad"></label>
+        <select asp-for="Periodicidad" class="form-control" asp-items="@(new SelectList(periodicidades))">
+            <option value="">Seleccione periodicidad</option>
+        </select>
+        <span asp-validation-for="Periodicidad" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Estado"></label>
+        <select asp-for="Estado" class="form-control" asp-items="@(new SelectList(estados))">
+            <option value="">Seleccione un estado</option>
+        </select>
+        <span asp-validation-for="Estado" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Observaciones"></label>
+        <textarea asp-for="Observaciones" class="form-control"></textarea>
+    </div>
+
+    <button type="submit" class="btn btn-success">Guardar</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+</form>

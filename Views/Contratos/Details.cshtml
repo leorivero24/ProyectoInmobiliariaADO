@@ -1,0 +1,32 @@
+@model ProyectoInmobiliariaADO.Models.ViewModels.ContratoDetailsViewModel
+
+@{
+    ViewData["Title"] = "Detalles Contrato";
+}
+
+<h1>Detalles del Contrato</h1>
+
+<h3>Contrato</h3>
+<dl class="row">
+  
+    <dt class="col-sm-3">Inicio</dt><dd class="col-sm-9">@Model.Contrato.FechaInicio.ToShortDateString()</dd>
+    <dt class="col-sm-3">Fin</dt><dd class="col-sm-9">@Model.Contrato.FechaFin?.ToShortDateString()</dd>
+    <dt class="col-sm-3">Monto</dt><dd class="col-sm-9">$@Model.Contrato.Monto</dd>
+    <dt class="col-sm-3">Periodicidad</dt><dd class="col-sm-9">@Model.Contrato.Periodicidad</dd>
+    <dt class="col-sm-3">Estado</dt><dd class="col-sm-9">@Model.Contrato.Estado</dd>
+    <dt class="col-sm-3">Observaciones</dt><dd class="col-sm-9">@Model.Contrato.Observaciones</dd>
+</dl>
+
+<h3>Inmueble</h3>
+<dl class="row">
+    <dt class="col-sm-3">Dirección</dt><dd class="col-sm-9">@Model.Inmueble.Direccion</dd>
+    <dt class="col-sm-3">Tipo</dt><dd class="col-sm-9">@Model.Inmueble.Tipo</dd>
+</dl>
+
+<h3>Inquilino</h3>
+<dl class="row">
+    <dt class="col-sm-3">Nombre</dt><dd class="col-sm-9">@Model.Inquilino.Nombre @Model.Inquilino.Apellido</dd>
+    <dt class="col-sm-3">DNI</dt><dd class="col-sm-9">@Model.Inquilino.DNI</dd>
+</dl>
+
+<a asp-action="Index" class="btn btn-secondary">Volver</a>

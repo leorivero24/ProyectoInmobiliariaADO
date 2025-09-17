@@ -1,0 +1,39 @@
+@model ProyectoInmobiliariaADO.Models.Contrato
+
+@{
+    ViewData["Title"] = "Eliminar Contrato";
+}
+
+<h1>Eliminar Contrato</h1>
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+
+<dl class="row">
+    <dt class="col-sm-2">Inmueble</dt>
+    <dd class="col-sm-10">@Model.InmuebleId</dd>
+    <dt class="col-sm-2">Inquilino</dt>
+    <dd class="col-sm-10">@Model.InquilinoId</dd>
+    <dt class="col-sm-2">Monto</dt>
+    <dd class="col-sm-10">$@Model.Monto</dd>
+</dl>
+
+@if (!TempData.ContainsKey("Error"))
+{
+    <form asp-action="Delete" method="post">
+        <input type="hidden" asp-for="Id" />
+        <button type="submit" class="btn btn-danger">Eliminar</button>
+        <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+    </form>
+}
+else
+{
+    <a asp-action="Index" class="btn btn-secondary">Volver</a>
+}
