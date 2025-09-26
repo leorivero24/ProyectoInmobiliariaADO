@@ -1,32 +1,97 @@
 @model ProyectoInmobiliariaADO.Models.ViewModels.ContratoDetailsViewModel
 
 @{
-    ViewData["Title"] = "Detalles Contrato";
+    ViewData["Title"] = "Detalles del Contrato";
 }
 
-<h1>Detalles del Contrato</h1>
+<div class="container mt-4">
+    <h1 class="mb-4 text-primary"><i class="bi bi-file-text"></i> Detalles del Contrato</h1>
 
-<h3>Contrato</h3>
-<dl class="row">
-  
-    <dt class="col-sm-3">Inicio</dt><dd class="col-sm-9">@Model.Contrato.FechaInicio.ToShortDateString()</dd>
-    <dt class="col-sm-3">Fin</dt><dd class="col-sm-9">@Model.Contrato.FechaFin?.ToShortDateString()</dd>
-    <dt class="col-sm-3">Monto</dt><dd class="col-sm-9">$@Model.Contrato.Monto</dd>
-    <dt class="col-sm-3">Periodicidad</dt><dd class="col-sm-9">@Model.Contrato.Periodicidad</dd>
-    <dt class="col-sm-3">Estado</dt><dd class="col-sm-9">@Model.Contrato.Estado</dd>
-    <dt class="col-sm-3">Observaciones</dt><dd class="col-sm-9">@Model.Contrato.Observaciones</dd>
-</dl>
+    <div class="card shadow-lg mb-4 border-0">
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0">Información del Contrato</h4>
+        </div>
+        <div class="card-body">
+            <dl class="row">
+                <dt class="col-sm-3 fw-bold text-secondary">Inmueble</dt>
+                <dd class="col-sm-9">@Model.Inmueble.Direccion</dd>
 
-<h3>Inmueble</h3>
-<dl class="row">
-    <dt class="col-sm-3">Dirección</dt><dd class="col-sm-9">@Model.Inmueble.Direccion</dd>
-    <dt class="col-sm-3">Tipo</dt><dd class="col-sm-9">@Model.Inmueble.Tipo</dd>
-</dl>
+                <dt class="col-sm-3 fw-bold text-secondary">Tipo</dt>
+                <dd class="col-sm-9">@Model.Inmueble.Tipo.Descripcion</dd>
 
-<h3>Inquilino</h3>
-<dl class="row">
-    <dt class="col-sm-3">Nombre</dt><dd class="col-sm-9">@Model.Inquilino.Nombre @Model.Inquilino.Apellido</dd>
-    <dt class="col-sm-3">DNI</dt><dd class="col-sm-9">@Model.Inquilino.DNI</dd>
-</dl>
+                <dt class="col-sm-3 fw-bold text-secondary">Inquilino</dt>
+                <dd class="col-sm-9">@($"{Model.Inquilino.Nombre} {Model.Inquilino.Apellido}")</dd>
 
-<a asp-action="Index" class="btn btn-secondary">Volver</a>
+                <dt class="col-sm-3 fw-bold text-secondary">Monto</dt>
+                <dd class="col-sm-9 text-success fw-bold">$@Model.Contrato.Monto</dd>
+
+                <dt class="col-sm-3 fw-bold text-secondary">Fecha Inicio</dt>
+                <dd class="col-sm-9">@Model.Contrato.FechaInicio.ToShortDateString()</dd>
+
+                <dt class="col-sm-3 fw-bold text-secondary">Fecha Fin</dt>
+                <dd class="col-sm-9">@Model.Contrato.FechaFin?.ToShortDateString()</dd>
+
+                <dt class="col-sm-3 fw-bold text-secondary">Estado</dt>
+                <dd class="col-sm-9">
+                    @if (Model.Contrato.Estado == "Vigente")
+                    {
+                        <span class="badge bg-success">Vigente</span>
+                    }
+                    else if (Model.Contrato.Estado == "Anulado")
+                    {
+                        <span class="badge bg-danger">Anulado</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-secondary">@Model.Contrato.Estado</span>
+                    }
+                </dd>
+
+                <dt class="col-sm-3 fw-bold text-secondary">Observaciones</dt>
+                <dd class="col-sm-9">@Model.Contrato.Observaciones</dd>
+            </dl>
+        </div>
+    </div>
+
+    @* Mostrar auditoría solo si es Administrador *@
+    @if (User.IsInRole("Administrador"))
+    {
+        <div class="card shadow-lg mb-4 border-0">
+            <div class="card-header bg-dark text-white">
+                <h4 class="mb-0">Auditoría</h4>
+            </div>
+            <div class="card-body">
+                <table class="table table-hover table-bordered align-middle">
+                    <thead class="table-secondary">
+                        <tr>
+                            <th>Acción</th>
+                            <th>Usuario</th>
+                            <th>Fecha</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="table-success">
+                            <td>Creación</td>
+                            <td>@Model.Contrato.UsuarioCreacionContrato</td>
+                            <td>@Model.Contrato.FechaCreacionContrato?.ToString("g")</td>
+                        </tr>
+                        @if (Model.Contrato.Estado == "Anulado")
+                        {
+                            <tr class="table-danger">
+                                <td>Anulación</td>
+                                <td>@Model.Contrato.UsuarioAnulacionContrato</td>
+                                <td>@Model.Contrato.FechaAnulacionContrato?.ToString("g")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+
+    <div class="d-flex gap-2">
+        <a asp-action="Index" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Volver
+        </a>
+    </div>
+</div>

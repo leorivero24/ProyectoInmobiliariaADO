@@ -1,0 +1,75 @@
+@model List<ProyectoInmobiliariaADO.Models.TipoInmueble>
+
+@{
+    ViewData["Title"] = "Tipos de Inmueble";
+    bool esAdmin = User.IsInRole("Administrador");
+}
+
+@await Html.PartialAsync("_Navbar")
+
+<h2>Tipos de Inmueble</h2>
+
+<p>
+    @* Todos los usuarios logueados pueden crear *@
+    <a class="btn btn-success" asp-action="Create">Nuevo Tipo</a>
+</p>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success" id="tipo-success">@TempData["Success"]</div>
+}
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger" id="tipo-error">@TempData["Error"]</div>
+}
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Descripción</th>
+            <th>Fecha Creación</th>
+            <th>Fecha Modificación</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var tipo in Model)
+        {
+            <tr>
+                <td>@tipo.Descripcion</td>
+                <td>@tipo.FechaCreacion.ToShortDateString()</td>
+                <td>@tipo.FechaModificacion.ToShortDateString()</td>
+                <td>
+                    <div class="btn-group" role="group">
+                        <a class="btn btn-info btn-sm" asp-action="Details" asp-route-id="@tipo.Id">Detalles</a>
+                        @* Todos los usuarios pueden editar *@
+                        <a class="btn btn-primary btn-sm" asp-action="Edit" asp-route-id="@tipo.Id">Editar</a>
+                        @* Solo administradores pueden eliminar *@
+                        @if (esAdmin)
+                        {
+                            <a class="btn btn-danger btn-sm" asp-action="Delete" asp-route-id="@tipo.Id">Eliminar</a>
+                        }
+                        else
+                        {
+                            <button class="btn btn-danger btn-sm" disabled>Eliminar</button>
+                        }
+                    </div>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@section Scripts {
+    <script>
+        // Oculta automáticamente las alertas de TipoInmueble después de 3 segundos
+        setTimeout(function() {
+            var successDiv = document.getElementById("tipo-success");
+            if (successDiv) successDiv.style.display = "none";
+
+            var errorDiv = document.getElementById("tipo-error");
+            if (errorDiv) errorDiv.style.display = "none";
+        }, 3000);
+    </script>
+}

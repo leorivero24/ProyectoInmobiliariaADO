@@ -5,45 +5,86 @@
     var estados = new List<string> { "Disponible", "Alquilado", "Reservado" }; // Opciones para el estado
 }
 
-<h1>Crear Inmueble</h1>
+@await Html.PartialAsync("_Navbar")
 
-<form asp-action="Create" method="post">
-    <div class="form-group">
-        <label>Dirección</label>
-        <input asp-for="Direccion" class="form-control" />
+<div class="container mt-4">
+    <h1 class="mb-4 text-primary">
+        <i class="bi bi-house-add"></i> Nuevo Inmueble
+    </h1>
+
+    <div class="card shadow-lg border-0">
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0">Formulario de Registro</h4>
+        </div>
+        <div class="card-body">
+            <form asp-action="Create" method="post">
+                <div class="mb-3">
+                    <label asp-for="Direccion" class="form-label fw-bold"></label>
+                    <input asp-for="Direccion" class="form-control" placeholder="Ingrese la dirección" />
+                    <span asp-validation-for="Direccion" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="TipoId" class="form-label fw-bold">Tipo</label>
+                    <select asp-for="TipoId" class="form-select" asp-items="ViewBag.Tipos">
+                        <option value="">-- Seleccione un tipo --</option>
+                    </select>
+                    <span asp-validation-for="TipoId" class="text-danger"></span>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label asp-for="Ambientes" class="form-label fw-bold"></label>
+                        <input asp-for="Ambientes" class="form-control" placeholder="Ej: 3" />
+                        <span asp-validation-for="Ambientes" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="Superficie" class="form-label fw-bold">Superficie (m²)</label>
+                        <input asp-for="Superficie" class="form-control" placeholder="Ej: 120" />
+                        <span asp-validation-for="Superficie" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Precio" class="form-label fw-bold"></label>
+                    <input asp-for="Precio" class="form-control" placeholder="Ej: 150000" />
+                    <span asp-validation-for="Precio" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="PropietarioId" class="form-label fw-bold">Propietario</label>
+                    @Html.DropDownListFor(model => model.PropietarioId,
+                        (SelectList)ViewBag.Propietarios,
+                        "Seleccione un propietario",
+                        new { @class = "form-select" })
+                    <span asp-validation-for="PropietarioId" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Estado</label>
+                    <input type="text" class="form-control" value="Disponible" readonly />
+                    <small class="text-muted">El estado se actualizará automáticamente según los contratos.</small>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Observaciones" class="form-label fw-bold"></label>
+                    <textarea asp-for="Observaciones" class="form-control" placeholder="Ingrese observaciones"></textarea>
+                    <span asp-validation-for="Observaciones" class="text-danger"></span>
+                </div>
+
+                <div class="d-flex gap-2 mt-4">
+                    <button type="submit" class="btn btn-success">
+                        <i class="bi bi-save"></i> Guardar
+                    </button>
+                    <a asp-action="Index" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-left"></i> Volver
+                    </a>
+                </div>
+            </form>
+        </div>
     </div>
-    <div class="form-group">
-        <label>Tipo</label>
-        <input asp-for="Tipo" class="form-control" />
-    </div>
-    <div class="form-group">
-        <label>Ambientes</label>
-        <input asp-for="Ambientes" class="form-control" />
-    </div>
-    <div class="form-group">
-        <label>Superficie (m²)</label>
-        <input asp-for="Superficie" class="form-control" />
-    </div>
-    <div class="form-group">
-        <label>Precio</label>
-        <input asp-for="Precio" class="form-control" />
-    </div>
-    <div class="form-group">
-        <label asp-for="PropietarioId" class="control-label">Propietario</label>
-        @Html.DropDownListFor(model => model.PropietarioId,
-                              (SelectList)ViewBag.Propietarios,
-                              "Seleccione un propietario",
-                              new { @class = "form-control" })
-        <span asp-validation-for="PropietarioId" class="text-danger"></span>
-    </div>
-    <div class="form-group">
-        <label>Estado</label>
-        <select asp-for="Estado" class="form-control" asp-items="@(new SelectList(estados))"></select>
-    </div>
-    <div class="form-group">
-        <label>Observaciones</label>
-        <textarea asp-for="Observaciones" class="form-control"></textarea>
-    </div>
-    <button type="submit" class="btn btn-success">Guardar</button>
-    <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
-</form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

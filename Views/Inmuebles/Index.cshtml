@@ -1,30 +1,78 @@
-
 @model IEnumerable<ProyectoInmobiliariaADO.Models.Inmueble>
 
 @{
     ViewData["Title"] = "Inmuebles";
+    bool esAdmin = User.IsInRole("Administrador");
 }
 
+@await Html.PartialAsync("_Navbar")
+
 <h1>Listado de Inmuebles</h1>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success" id="alertaSuccess" role="alert">
+        @TempData["Success"]
+    </div>
+}
 
 @if (TempData["ErrorEliminar"] != null)
 {
     <div class="alert alert-danger" id="alertaEliminar" role="alert">
         @TempData["ErrorEliminar"]
     </div>
-
-    <script>
-        // Ocultar mensaje después de 3 segundos
-        setTimeout(function () {
-            var alert = document.getElementById("alertaEliminar");
-            if (alert) alert.style.display = "none";
-        }, 3000);
-    </script>
 }
+
+<script>
+    setTimeout(function () {
+        var alertaSuccess = document.getElementById("alertaSuccess");
+        if (alertaSuccess) alertaSuccess.style.display = "none";
+
+        var alertaEliminar = document.getElementById("alertaEliminar");
+        if (alertaEliminar) alertaEliminar.style.display = "none";
+    }, 3000);
+</script>
 
 <p>
     <a asp-action="Create" class="btn btn-primary">Nuevo Inmueble</a>
+    <a asp-action="Index" asp-route-filtro="Todos" class="btn btn-secondary ms-2">Listar Todos</a>
+    <a asp-action="Index" asp-route-filtro="Disponibles" class="btn btn-success ms-2">Listar Disponibles</a>
+    <button id="btnFiltrarFechas" class="btn btn-info ms-2">Listar por fechas de contrato</button>
 </p>
+
+<!-- Formulario de fechas, se mantiene visible si ya se buscó -->
+<div id="formFechas" class="mb-3 p-3 border rounded" style="display:@(ViewBag.FechaInicio != null ? "block" : "none")">
+    <form method="get" asp-action="Index">
+        <div class="row g-2 align-items-end">
+            <div class="col-auto">
+                <label for="fechaInicio">Fecha Inicio:</label>
+                <input type="date" class="form-control" id="fechaInicio" name="fechaInicio" 
+                       value="@ViewBag.FechaInicio" />
+            </div>
+            <div class="col-auto">
+                <label for="fechaFin">Fecha Fin:</label>
+                <input type="date" class="form-control" id="fechaFin" name="fechaFin" 
+                       value="@ViewBag.FechaFin" />
+            </div>
+            <div class="col-auto">
+                <button type="submit" class="btn btn-primary">Buscar</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+    // Mostrar/ocultar formulario al hacer click
+    document.getElementById("btnFiltrarFechas").addEventListener("click", function () {
+        var form = document.getElementById("formFechas");
+        if (form.style.display === "none") {
+            form.style.display = "block";
+            
+        } else {
+            form.style.display = "none";
+        }
+    });
+</script>
 
 <div class="table-responsive">
     <table class="table table-striped">
@@ -38,32 +86,37 @@
                 <th>Propietario</th>
                 <th>Estado</th>
                 <th>Observaciones</th>
-                <th></th> <!-- Columna para botones -->
+                <th>Acciones</th>
             </tr>
         </thead>
         <tbody>
-        @foreach (var item in Model)
-        {
-            <tr>
-                <td>@item.Direccion</td>
-                <td>@item.Tipo</td>
-                <td>@item.Ambientes</td>
-                <td>@item.Superficie m²</td>
-                <td>$@item.Precio</td>
-                <td>@item.PropietarioNombre @item.PropietarioApellido</td>
-                <td>@item.Estado</td>
-                <td>@item.Observaciones</td>
-                <td style="min-width: 200px;">
-                    <div class="btn-group" role="group">
-                        <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-info btn-sm">Detalles</a>
-                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-warning btn-sm">Editar</a>
-                        <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-danger btn-sm">Eliminar</a>
-                    </div>
-                </td>
-            </tr>
-        }
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.Direccion</td>
+                    <td>@item.Tipo?.Descripcion</td>
+                    <td>@item.Ambientes</td>
+                    <td>@item.Superficie m²</td>
+                    <td>$@item.Precio</td>
+                    <td>@item.PropietarioNombre @item.PropietarioApellido</td>
+                    <td>@item.Estado</td>
+                    <td>@item.Observaciones</td>
+                    <td style="min-width: 200px;">
+                        <div class="btn-group" role="group">
+                            <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-info btn-sm">Detalles</a>
+                            <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-warning btn-sm">Editar</a>
+                            @if (esAdmin)
+                            {
+                                <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-danger btn-sm">Eliminar</a>
+                            }
+                            else
+                            {
+                                <button class="btn btn-danger btn-sm" disabled>Eliminar</button>
+                            }
+                        </div>
+                    </td>
+                </tr>
+            }
         </tbody>
     </table>
 </div>
-
-

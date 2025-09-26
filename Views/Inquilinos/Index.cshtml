@@ -1,13 +1,18 @@
 @model IEnumerable<ProyectoInmobiliariaADO.Models.Inquilino>
 
-
 @{
     ViewData["Title"] = "Inquilinos";
+
+    // Determinar si el usuario es administrador
+    bool esAdmin = User.IsInRole("Administrador");
 }
+
+@await Html.PartialAsync("_Navbar")
 
 <h1>Lista de Inquilinos</h1>
 
 <p>
+    @* Todos pueden crear, no solo admins *@
     <a asp-action="Create" class="btn btn-primary">Nuevo Inquilino</a>
 </p>
 
@@ -20,25 +25,35 @@
             <th>Teléfono</th>
             <th>Email</th>
             <th>Dirección</th>
-            <th></th>
+            <th>Acciones</th>
         </tr>
     </thead>
     <tbody>
-    @foreach (var item in Model)
-    {
-        <tr>
-            <td>@item.DNI</td>
-            <td>@item.Nombre</td>
-            <td>@item.Apellido</td>
-            <td>@item.Telefono</td>
-            <td>@item.Email</td>
-            <td>@item.Direccion</td>
-            <td>
-                 <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-warning btn-sm">Editar</a>
-                    
-                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-danger btn-sm">Eliminar</a>
-            </td>
-        </tr>
-    }
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.DNI</td>
+                <td>@item.Nombre</td>
+                <td>@item.Apellido</td>
+                <td>@item.Telefono</td>
+                <td>@item.Email</td>
+                <td>@item.Direccion</td>
+                <td>
+                    @* Todos pueden editar *@
+                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-info btn-sm">Detalles</a>
+                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-warning btn-sm">Editar</a>
+
+                    @* Solo admins pueden eliminar *@
+                    @if (esAdmin)
+                    {
+                        <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-danger btn-sm">Eliminar</a>
+                    }
+                    else
+                    {
+                        <button class="btn btn-danger btn-sm" disabled>Eliminar</button>
+                    }
+                </td>
+            </tr>
+        }
     </tbody>
 </table>

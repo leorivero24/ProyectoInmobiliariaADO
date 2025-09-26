@@ -1,0 +1,91 @@
+
+@using ProyectoInmobiliariaADO.Data
+@using System.Security.Claims
+
+@{
+    var repo = new ProyectoInmobiliariaADO.Data.RepositorioUsuario();
+}
+
+
+@{
+    var esAdmin = User.IsInRole("Administrador");
+
+    // Obtener usuario desde la base de datos
+    var usuarioId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+    var usuario = usuarioId != null ? repo.ObtenerPorId(int.Parse(usuarioId)) : null;
+
+    // URL del avatar
+    var avatarUrl = string.IsNullOrEmpty(usuario?.Avatar)
+        ? "https://cdn-icons-png.flaticon.com/512/847/847969.png"
+        : Url.Content($"~/uploads/{usuario.Avatar}");
+}
+
+@if (User.Identity?.IsAuthenticated == true)
+{
+    <nav class="navbar navbar-expand-sm navbar-light bg-white border-bottom mb-3">
+        <div class="container-fluid">
+            <a class="navbar-brand" asp-controller="Home" asp-action="Index">ProyectoInmobiliariaADO</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent"
+                    aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarContent">
+                <ul class="navbar-nav me-auto mb-2 mb-sm-0">
+                    <li class="nav-item me-2">
+                        <a class="btn btn-primary" asp-controller="Inquilinos" asp-action="Index">Inquilinos</a>
+                    </li>
+                    <li class="nav-item me-2">
+                        <a class="btn btn-success" asp-controller="Propietarios" asp-action="Index">Propietarios</a>
+                    </li>
+                    <li class="nav-item me-2">
+                        <a class="btn btn-warning" asp-controller="Inmuebles" asp-action="Index">Inmuebles</a>
+                    </li>
+                    <li class="nav-item me-2">
+                        <a class="btn btn-info" asp-controller="Contratos" asp-action="Index">Contratos</a>
+                    </li>
+                    <li class="nav-item me-2">
+                        <a class="btn btn-secondary" asp-controller="TipoInmueble" asp-action="Index">Tipo Inmuebles</a>
+                    </li>
+                    <li class="nav-item me-2">
+                        <a class="btn btn-dark" asp-controller="Pagos" asp-action="Index">Pagos</a>
+                    </li>
+                    <li class="nav-item me-2">
+                        @if (esAdmin)
+                        {
+                            <a class="btn btn-danger" asp-controller="Usuarios" asp-action="Index">Usuarios</a>
+                        }
+                        else
+                        {
+                            <a class="btn btn-danger disabled" style="pointer-events:none; opacity:0.5;">Usuarios</a>
+                        }
+                    </li>
+                </ul>
+
+                <!-- Dropdown del usuario -->
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="userDropdown" role="button"
+                           data-bs-toggle="dropdown" aria-expanded="false">
+                            <img src="@avatarUrl" alt="Avatar" class="rounded-circle me-2" 
+                                 style="width:35px; height:35px; object-fit:cover;">
+                            <span>@usuario?.Nombre (@User.FindFirst(ClaimTypes.Role)?.Value)</span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                            <li>
+                                <a class="dropdown-item" asp-controller="Usuarios" asp-action="Perfil">Mi Perfil</a>
+                            </li>
+                            <li><hr class="dropdown-divider" /></li>
+                            <li>
+                                <form asp-controller="Account" asp-action="Logout" method="post" class="m-0">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="dropdown-item text-danger">Salir</button>
+                                </form>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+}

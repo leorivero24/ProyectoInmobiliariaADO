@@ -1,0 +1,71 @@
+@model ProyectoInmobiliariaADO.Models.Usuario
+
+@{
+    ViewData["Title"] = "Crear Usuario";
+}
+
+@await Html.PartialAsync("_Navbar")
+
+<div class="container mt-4">
+    <h1 class="mb-4 text-primary">
+        <i class="bi bi-person-plus"></i> Crear Usuario
+    </h1>
+
+    <div class="card shadow-lg border-0">
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0">Formulario de Usuario</h4>
+        </div>
+        <div class="card-body">
+            <form asp-action="Create" method="post" enctype="multipart/form-data">
+                @Html.AntiForgeryToken()
+
+                <div class="mb-3">
+                    <label asp-for="Nombre" class="form-label fw-bold"></label>
+                    <input asp-for="Nombre" class="form-control" placeholder="Ingrese el nombre" />
+                    <span asp-validation-for="Nombre" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Email" class="form-label fw-bold"></label>
+                    <input asp-for="Email" class="form-control" placeholder="ejemplo@email.com" />
+                    <span asp-validation-for="Email" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="PasswordHash" class="form-label fw-bold">Contraseña</label>
+                    <input asp-for="PasswordHash" class="form-control" type="password" placeholder="Ingrese una contraseña" />
+                    <span asp-validation-for="PasswordHash" class="text-danger"></span>
+                </div>
+
+                @* Solo administradores pueden asignar rol *@
+                @if (User.IsInRole("Administrador"))
+                {
+                    <div class="mb-3">
+                        <label asp-for="Rol" class="form-label fw-bold">Rol</label>
+                        <select asp-for="Rol" class="form-select" asp-items="Html.GetEnumSelectList<ProyectoInmobiliariaADO.Models.RolUsuario>()">
+                            <option value="">-- Seleccione un rol --</option>
+                        </select>
+                    </div>
+                }
+
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Avatar</label>
+                    <input type="file" name="AvatarFile" class="form-control" />
+                </div>
+
+                <div class="d-flex gap-2 mt-4">
+                    <button type="submit" class="btn btn-success">
+                        <i class="bi bi-save"></i> Crear
+                    </button>
+                    <a asp-action="Index" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-left"></i> Cancelar
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

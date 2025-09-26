@@ -2,69 +2,106 @@
 
 @{
     ViewData["Title"] = "Contratos";
+    bool esAdmin = User.IsInRole("Administrador");
 }
 
-<h1>Listado de Contratos</h1>
+@await Html.PartialAsync("_Navbar")
 
-@if (TempData["Success"] != null)
+<h1 class="mb-4">Listado de Contratos</h1>
+
+@if (TempData["ContratoError"] != null)
 {
-    <div id="temp-success" class="alert alert-success">@TempData["Success"]</div>
+    <div class="alert alert-danger alert-dismissible fade show" role="alert" id="alertaContratoError">
+        @TempData["ContratoError"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
 }
-@if (TempData["Error"] != null)
+
+@if (TempData["ContratoSuccess"] != null)
 {
-    <div id="temp-error" class="alert alert-danger">@TempData["Error"]</div>
+    <div class="alert alert-success alert-dismissible fade show" role="alert" id="alertaContratoSuccess">
+        @TempData["ContratoSuccess"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
 }
 
 @section Scripts {
     <script>
-        // Espera 3 segundos (3000 ms) y oculta los mensajes
-        setTimeout(function() {
-            var successDiv = document.getElementById("temp-success");
-            if (successDiv) successDiv.style.display = "none";
-
-            var errorDiv = document.getElementById("temp-error");
-            if (errorDiv) errorDiv.style.display = "none";
-        }, 3000);
+        setTimeout(function () {
+            var alertaE = document.getElementById("alertaContratoError");
+            if (alertaE) alertaE.style.display = "none";
+            var alertaS = document.getElementById("alertaContratoSuccess");
+            if (alertaS) alertaS.style.display = "none";
+        }, 4000);
     </script>
 }
 
-
 <p>
-    <a asp-action="Create" class="btn btn-primary">Nuevo Contrato</a>
+    <a asp-action="Create" class="btn btn-primary mb-3">Nuevo Contrato</a>
 </p>
 
-<table class="table table-striped">
-    <thead>
+<table class="table table-striped table-hover align-middle">
+    <thead class="table-dark">
         <tr>
-            <th>Inmueble</th>
-            <th>Inquilino</th>
-            <th>Fecha Inicio</th>
+            <th >Inmueble</th>
+            <th>Tipo</th>
+            <th >Inquilino</th>
+            <th>Periodicidad</th>
+            <th class="w-20 text-nowrap">Fecha Inicio</th>
             <th>Fecha Fin</th>
             <th>Monto</th>
             <th>Estado</th>
             <th>Observaciones</th>
-            <th></th>
+            <th>Acciones</th>
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>@item.InmuebleDireccion</td>
-            <td>@($"{item.InquilinoNombre} {item.InquilinoApellido}")</td>
-            <td>@item.FechaInicio.ToShortDateString()</td>
-            <td>@item.FechaFin?.ToShortDateString()</td>
-            <td>$@item.Monto</td>
-            <td>@item.Estado</td>
-            <td>@item.Observaciones</td>
-            <td>
-                <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-info btn-sm">Detalles</a>
-                <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-warning btn-sm">Editar</a>
-                <form asp-action="Delete" asp-route-id="@item.Id" method="post" style="display:inline">
-                    <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
-                </form>
-            </td>
-        </tr>
-}
+        @foreach (var item in Model)
+        {
+            var estadoClass = item.Estado == "Anulado" ? "text-danger fw-bold" : "text-success";
+
+            <tr>
+                <td>@item.InmuebleDireccion</td>
+                <td>@item.InmuebleTipo</td>
+                <td>@($"{item.InquilinoNombre} {item.InquilinoApellido}")</td>
+                <td>@item.Periodicidad</td>
+                <td>@item.FechaInicio.ToShortDateString()</td>
+                <td>@item.FechaFin?.ToShortDateString()</td>
+                <td>$@item.Monto</td>
+                <td class="@estadoClass">@item.Estado</td>
+                <td>@item.Observaciones</td>
+                <td style="min-width: 300px;">
+                    <div class="btn-group" role="group">
+                        <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-info btn-sm me-1">Detalles</a>
+
+                        @if (item.Estado != "Anulado")
+                        {
+                            <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-warning btn-sm me-1">Editar</a>
+                        }
+                        else
+                        {
+                            <button class="btn btn-warning btn-sm me-1" disabled>Editar</button>
+                        }
+
+                        <form asp-action="Anular" asp-route-id="@item.Id" method="post" style="display:inline">
+                            <button type="submit" class="btn btn-secondary btn-sm me-1" @(item.Estado == "Anulado" ? "disabled" : "")>
+                                @(item.Estado == "Anulado" ? "Anulado" : "Anular")
+                            </button>
+                        </form>
+
+                        @if (esAdmin)
+                        {
+                            <form asp-action="EliminarDefinitivo" asp-route-id="@item.Id" method="post" style="display:inline">
+                                <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
+                            </form>
+                        }
+                        else
+                        {
+                            <button class="btn btn-danger btn-sm" disabled>Eliminar</button>
+                        }
+                    </div>
+                </td>
+            </tr>
+        }
     </tbody>
 </table>
-

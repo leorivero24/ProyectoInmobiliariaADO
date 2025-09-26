@@ -1,0 +1,132 @@
+@* @model ProyectoInmobiliariaADO.Models.Usuario
+@{
+    ViewData["Title"] = "Mi Perfil";
+}
+
+<h2>Mi Perfil</h2>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success" id="alertaSuccess">@TempData["Success"]</div>
+}
+
+<form asp-action="Perfil" method="post" enctype="multipart/form-data">
+    <div class="mb-3">
+        <label class="form-label">Nombre</label>
+        <input asp-for="Nombre" class="form-control" />
+        <span asp-validation-for="Nombre" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Email</label>
+        <input asp-for="Email" class="form-control" />
+        <span asp-validation-for="Email" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Avatar</label>
+        <input type="file" name="AvatarFile" class="form-control" />
+        @if (!string.IsNullOrEmpty(Model.Avatar))
+        {
+            <div class="mt-2">
+                <img src="~/uploads/@Model.Avatar" alt="Avatar" class="rounded-circle"
+                     style="width:80px; height:80px; object-fit:cover;">
+                <div class="form-check mt-1">
+                    <input type="checkbox" name="RemoveAvatar" value="true" class="form-check-input" id="removeAvatar">
+                    <label class="form-check-label" for="removeAvatar">Eliminar avatar</label>
+                </div>
+            </div>
+        }
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Nueva Contraseña</label>
+        <input type="password" name="NuevaPassword" class="form-control"
+               placeholder="Dejar en blanco para mantener la actual" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Guardar</button>
+    <a asp-controller="Home" asp-action="Index" class="btn btn-secondary ms-2">Cancelar</a>
+</form>
+
+@section Scripts {
+    <script>
+        // Oculta la alerta y redirige al Home/Index después de 3 segundos
+        setTimeout(function () {
+            var alerta = document.getElementById("alertaSuccess");
+            if (alerta) {
+                alerta.style.display = "none";
+                window.location.href = '@Url.Action("Index", "Home")';
+            }
+        }, 3000);
+    </script>
+} *@
+
+
+@model ProyectoInmobiliariaADO.Models.Usuario
+@{
+    ViewData["Title"] = "Mi Perfil";
+
+    // URL del avatar: predeterminado si no existe
+    var avatarUrl = string.IsNullOrEmpty(Model.Avatar)
+        ? "https://cdn-icons-png.flaticon.com/512/847/847969.png" // avatar predeterminado
+        : Url.Content($"~/uploads/{Model.Avatar}");
+}
+
+<h2>Mi Perfil</h2>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success" id="alertaSuccess">@TempData["Success"]</div>
+}
+
+<form asp-action="Perfil" method="post" enctype="multipart/form-data">
+    <div class="mb-3">
+        <label class="form-label">Nombre</label>
+        <input asp-for="Nombre" class="form-control" />
+        <span asp-validation-for="Nombre" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Email</label>
+        <input asp-for="Email" class="form-control" />
+        <span asp-validation-for="Email" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Avatar</label>
+        <input type="file" name="AvatarFile" class="form-control" />
+        <div class="mt-2">
+            <img src="@avatarUrl" alt="Avatar" class="rounded-circle" style="width:80px; height:80px; object-fit:cover;">
+            @if (!string.IsNullOrEmpty(Model.Avatar))
+            {
+                <div class="form-check mt-1">
+                    <input type="checkbox" name="RemoveAvatar" value="true" class="form-check-input" id="removeAvatar">
+                    <label class="form-check-label" for="removeAvatar">Eliminar avatar</label>
+                </div>
+            }
+        </div>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Nueva Contraseña</label>
+        <input type="password" name="NuevaPassword" class="form-control"
+               placeholder="Dejar en blanco para mantener la actual" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Guardar</button>
+    <a asp-controller="Home" asp-action="Index" class="btn btn-secondary ms-2">Cancelar</a>
+</form>
+
+@section Scripts {
+    <script>
+        // Oculta la alerta y redirige al Home/Index después de 3 segundos
+        setTimeout(function () {
+            var alerta = document.getElementById("alertaSuccess");
+            if (alerta) {
+                alerta.style.display = "none";
+                window.location.href = '@Url.Action("Index", "Home")';
+            }
+        }, 3000);
+    </script>
+}

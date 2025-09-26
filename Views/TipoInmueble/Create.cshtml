@@ -1,0 +1,24 @@
+@model ProyectoInmobiliariaADO.Models.TipoInmueble
+
+@{
+    ViewData["Title"] = "Crear Tipo de Inmueble";
+}
+
+@await Html.PartialAsync("_Navbar")
+
+<h2>Crear Tipo de Inmueble</h2>
+
+<form asp-action="Create" method="post">
+    <div class="form-group">
+        <label asp-for="Descripcion" class="control-label"></label>
+        <input asp-for="Descripcion" class="form-control" />
+        <span asp-validation-for="Descripcion" class="text-danger"></span>
+    </div>
+    <br/>
+    <button type="submit" class="btn btn-success">Guardar</button>
+    <a class="btn btn-secondary" asp-action="Index">Cancelar</a>
+</form>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

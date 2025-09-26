@@ -4,72 +4,86 @@
     ViewData["Title"] = "Editar Contrato";
 }
 
-<h1>Editar Contrato</h1>
+@await Html.PartialAsync("_Navbar")
 
-<form asp-action="Edit" method="post">
-    <input type="hidden" asp-for="Id" />
+<div class="container mt-4">
+    <h1 class="mb-4 text-warning">
+        <i class="bi bi-pencil-square"></i> Editar Contrato
+    </h1>
 
-    <div class="form-group">
-        <label asp-for="InmuebleId">Inmueble</label>
-        <select asp-for="InmuebleId" class="form-control" asp-items="ViewBag.Inmuebles"></select>
-        <span asp-validation-for="InmuebleId" class="text-danger"></span>
+    <div class="card shadow-lg border-0">
+        <div class="card-header bg-warning text-dark">
+            <h4 class="mb-0">Formulario de Edición</h4>
+        </div>
+        <div class="card-body">
+            <form asp-action="Edit" method="post">
+                <input type="hidden" asp-for="Id" />
+
+                <div class="form-group mb-3">
+                    <label asp-for="InmuebleId" class="form-label fw-bold">Inmueble</label>
+                    <select asp-for="InmuebleId" class="form-control" asp-items="ViewBag.Inmuebles"></select>
+                    <span asp-validation-for="InmuebleId" class="text-danger"></span>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label asp-for="InquilinoId" class="form-label fw-bold">Inquilino</label>
+                    <select asp-for="InquilinoId" class="form-control" asp-items="ViewBag.Inquilinos"></select>
+                    <span asp-validation-for="InquilinoId" class="text-danger"></span>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label asp-for="Periodicidad" class="form-label fw-bold">Periodicidad</label>
+                    @{
+                        var periodicidades = new List<string> { "Mensual", "Trimestral","Semestral", "Anual" };
+                    }
+                    <select asp-for="Periodicidad" class="form-control"
+                        asp-items="@(new SelectList(periodicidades, Model.Periodicidad))"></select>
+                    <span asp-validation-for="Periodicidad" class="text-danger"></span>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label asp-for="FechaInicio" class="form-label fw-bold">Fecha Inicio</label>
+                        <input asp-for="FechaInicio" type="date" class="form-control" />
+                        <span asp-validation-for="FechaInicio" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="FechaFin" class="form-label fw-bold">Fecha Fin</label>
+                        <input asp-for="FechaFin" type="date" class="form-control" />
+                        <span asp-validation-for="FechaFin" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label asp-for="Monto" class="form-label fw-bold">Monto</label>
+                    <input asp-for="Monto" class="form-control" type="number" step="0.01" min="0" />
+                    <span asp-validation-for="Monto" class="text-danger"></span>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label asp-for="Estado" class="form-label fw-bold">Estado</label>
+                    @{
+                        var estados = new List<string> { "Vigente", "Finalizado", "Rescindido" };
+                    }
+                    <select asp-for="Estado" class="form-control" asp-items="@(new SelectList(estados, Model.Estado))"></select>
+                    <span asp-validation-for="Estado" class="text-danger"></span>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label asp-for="Observaciones" class="form-label fw-bold">Observaciones</label>
+                    <textarea asp-for="Observaciones" class="form-control" rows="3"></textarea>
+                    <span asp-validation-for="Observaciones" class="text-danger"></span>
+                </div>
+
+                <div class="d-flex gap-2 mt-4">
+                    <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+                    <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+                </div>
+            </form>
+        </div>
     </div>
-
-    <div class="form-group">
-        <label asp-for="InquilinoId">Inquilino</label>
-        <select asp-for="InquilinoId" class="form-control" asp-items="ViewBag.Inquilinos"></select>
-        <span asp-validation-for="InquilinoId" class="text-danger"></span>
-    </div>
-
-    <div class="form-group">
-        <label asp-for="FechaInicio">Fecha Inicio</label>
-        <input asp-for="FechaInicio" type="date" class="form-control" />
-        <span asp-validation-for="FechaInicio" class="text-danger"></span>
-    </div>
-
-    <div class="form-group">
-        <label asp-for="FechaFin">Fecha Fin</label>
-        <input asp-for="FechaFin" type="date" class="form-control" />
-        <span asp-validation-for="FechaFin" class="text-danger"></span>
-    </div>
-
-    <div class="form-group">
-        <label asp-for="Monto">Monto</label>
-         <input asp-for="Monto" class="form-control" type="number" step="0.01" min="0" />
-        <span asp-validation-for="Monto" class="text-danger"></span>
-    </div>
-
-    <div class="form-group">
-        <label asp-for="Periodicidad">Periodicidad</label>
-        @{
-            var periodicidades = new List<string> { "Mensual", "Trimestral", "Anual" };
-        }
-        <select asp-for="Periodicidad" class="form-control"
-            asp-items="@(new SelectList(periodicidades, Model.Periodicidad))"></select>
-        <span asp-validation-for="Periodicidad" class="text-danger"></span>
-    </div>
-
-    <div class="form-group">
-        <label asp-for="Estado">Estado</label>
-        @{
-            var estados = new List<string> { "Vigente", "Finalizado", "Rescindido" };
-        }
-        <select asp-for="Estado" class="form-control" asp-items="@(new SelectList(estados, Model.Estado))"></select>
-        <span asp-validation-for="Estado" class="text-danger"></span>
-    </div>
-
-    <div class="form-group">
-        <label asp-for="Observaciones">Observaciones</label>
-        <textarea asp-for="Observaciones" class="form-control"></textarea>
-        <span asp-validation-for="Observaciones" class="text-danger"></span>
-    </div>
-
-    <button type="submit" class="btn btn-success">Guardar</button>
-    <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
-</form>
+</div>
 
 @section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
+    <partial name="_ValidationScriptsPartial" />
 }

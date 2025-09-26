@@ -1,0 +1,80 @@
+@model ProyectoInmobiliariaADO.Models.Usuario
+
+@{
+    ViewData["Title"] = "Editar Usuario";
+    bool esAdmin = User.IsInRole("Administrador");
+}
+
+@await Html.PartialAsync("_Navbar")
+
+<div class="container mt-4">
+    <h1 class="mb-4 text-warning">
+        <i class="bi bi-pencil-square"></i> Editar Usuario
+    </h1>
+
+    <div class="card shadow-lg border-0">
+        <div class="card-header bg-warning text-dark">
+            <h4 class="mb-0">Formulario de Edición</h4>
+        </div>
+        <div class="card-body">
+            <form asp-action="Edit" method="post" enctype="multipart/form-data">
+                @Html.AntiForgeryToken()
+                <input type="hidden" asp-for="Id" />
+
+                <div class="mb-3">
+                    <label asp-for="Nombre" class="form-label fw-bold"></label>
+                    <input asp-for="Nombre" class="form-control" placeholder="Ingrese el nombre" />
+                    <span asp-validation-for="Nombre" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Email" class="form-label fw-bold"></label>
+                    <input asp-for="Email" class="form-control" placeholder="ejemplo@email.com" />
+                    <span asp-validation-for="Email" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="PasswordHash" class="form-label fw-bold">Nueva Contraseña</label>
+                    <input asp-for="PasswordHash" class="form-control" type="password" placeholder="Ingrese nueva contraseña" />
+                    <span asp-validation-for="PasswordHash" class="text-danger"></span>
+                </div>
+
+                @if (esAdmin)
+                {
+                    <div class="mb-3">
+                        <label asp-for="Rol" class="form-label fw-bold">Rol</label>
+                        <select asp-for="Rol" class="form-select" asp-items="ViewBag.Roles"></select>
+                    </div>
+                }
+
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Avatar</label>
+                    <input type="file" name="AvatarFile" class="form-control" />
+                    @if (!string.IsNullOrEmpty(Model.Avatar))
+                    {
+                        <div class="mt-2">
+                            <img src="~/uploads/@Model.Avatar" alt="Avatar" width="100" class="img-thumbnail" />
+                            <div class="form-check mt-1">
+                                <input class="form-check-input" type="checkbox" name="RemoveAvatar" value="true" id="removeAvatar">
+                                <label class="form-check-label" for="removeAvatar">Eliminar avatar</label>
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                <div class="d-flex gap-2 mt-4">
+                    <button type="submit" class="btn btn-success">
+                        <i class="bi bi-save"></i> Guardar
+                    </button>
+                    <a asp-action="Index" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-left"></i> Cancelar
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <partial name="_ValidationScriptsPartial" />
+}

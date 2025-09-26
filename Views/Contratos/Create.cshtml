@@ -2,68 +2,98 @@
 
 @{
     ViewData["Title"] = "Nuevo Contrato";
-    var estados = new List<string> { "Vigente", "Finalizado", "Rescindido" };
-    var periodicidades = new List<string> { "Mensual", "Trimestral", "Anual" };
+    var periodicidades = new List<string> { "Mensual", "Trimestral", "Semestral", "Anual" };
 }
 
-<h1>Crear Contrato</h1>
+@await Html.PartialAsync("_Navbar")
 
-<form asp-action="Create" method="post">
-    <div class="form-group">
-        <label asp-for="InmuebleId">Inmueble</label>
-        <select asp-for="InmuebleId" class="form-control" asp-items="ViewBag.Inmuebles">
-            <option value="">Seleccione un inmueble</option>
-        </select>
-        <span asp-validation-for="InmuebleId" class="text-danger"></span>
+<div class="container mt-4">
+    <h1 class="mb-4 text-primary">
+        <i class="bi bi-file-earmark-text"></i> Nuevo Contrato
+    </h1>
+
+    <div class="card shadow-lg border-0">
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0">Formulario de Contrato</h4>
+        </div>
+        <div class="card-body">
+            <form asp-action="Create" method="post">
+
+                <div class="mb-3">
+                    <label asp-for="InmuebleId" class="form-label fw-bold">Inmueble</label>
+                    @Html.DropDownListFor(model => model.InmuebleId,
+                        (SelectList)ViewBag.Inmuebles,
+                        "-- Seleccione Inmueble --",
+                        new { @class = "form-select" })
+                    <span asp-validation-for="InmuebleId" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="InquilinoId" class="form-label fw-bold">Inquilino</label>
+                    @Html.DropDownListFor(model => model.InquilinoId,
+                        (SelectList)ViewBag.Inquilinos,
+                        "-- Seleccione Inquilino --",
+                        new { @class = "form-select" })
+                    <span asp-validation-for="InquilinoId" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Periodicidad" class="form-label fw-bold">Periodicidad</label>
+                    <select asp-for="Periodicidad" class="form-select"
+                            asp-items="@(new SelectList(periodicidades, Model?.Periodicidad))">
+                    </select>
+                    <span asp-validation-for="Periodicidad" class="text-danger"></span>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label asp-for="FechaInicio" class="form-label fw-bold">Fecha de Inicio</label>
+                        <input asp-for="FechaInicio" type="date" class="form-control" />
+                        <span asp-validation-for="FechaInicio" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="FechaFin" class="form-label fw-bold">Fecha de Fin</label>
+                        <input asp-for="FechaFin" type="date" class="form-control" />
+                        <span asp-validation-for="FechaFin" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Monto" class="form-label fw-bold">Monto de Alquiler</label>
+                    <input asp-for="Monto" class="form-control" type="number" step="0.01" min="0" placeholder="Ej: 15000.00" />
+                    <span asp-validation-for="Monto" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Observaciones" class="form-label fw-bold">Observaciones</label>
+                    <textarea asp-for="Observaciones" class="form-control" rows="3" placeholder="Ingrese observaciones o condiciones especiales"></textarea>
+                    <span asp-validation-for="Observaciones" class="text-danger"></span>
+                </div>
+
+                @* Mostrar errores de validación extra, como superposición de fechas *@
+                @if (!ViewData.ModelState.IsValid)
+                {
+                    <div class="alert alert-danger mt-2">
+                        @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                        {
+                            <div>@error.ErrorMessage</div>
+                        }
+                    </div>
+                }
+
+                <div class="d-flex gap-2 mt-4">
+                    <button type="submit" class="btn btn-success">
+                        <i class="bi bi-save"></i> Guardar Contrato
+                    </button>
+                    <a asp-action="Index" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-left"></i> Cancelar
+                    </a>
+                </div>
+            </form>
+        </div>
     </div>
+</div>
 
-    <div class="form-group">
-        <label asp-for="InquilinoId">Inquilino</label>
-        <select asp-for="InquilinoId" class="form-control" asp-items="ViewBag.Inquilinos">
-            <option value="">Seleccione un inquilino</option>
-        </select>
-        <span asp-validation-for="InquilinoId" class="text-danger"></span>
-    </div>
-
-    <div class="form-group">
-        <label asp-for="FechaInicio"></label>
-        <input asp-for="FechaInicio" type="date" class="form-control" />
-        <span asp-validation-for="FechaInicio" class="text-danger"></span>
-    </div>
-
-    <div class="form-group">
-        <label asp-for="FechaFin"></label>
-        <input asp-for="FechaFin" type="date" class="form-control" />
-        <span asp-validation-for="FechaFin" class="text-danger"></span>
-    </div>
-
-    <div class="form-group">
-        <label asp-for="Monto"></label>
-        <input asp-for="Monto" class="form-control" />
-        <span asp-validation-for="Monto" class="text-danger"></span>
-    </div>
-
-    <div class="form-group">
-        <label asp-for="Periodicidad"></label>
-        <select asp-for="Periodicidad" class="form-control" asp-items="@(new SelectList(periodicidades))">
-            <option value="">Seleccione periodicidad</option>
-        </select>
-        <span asp-validation-for="Periodicidad" class="text-danger"></span>
-    </div>
-
-    <div class="form-group">
-        <label asp-for="Estado"></label>
-        <select asp-for="Estado" class="form-control" asp-items="@(new SelectList(estados))">
-            <option value="">Seleccione un estado</option>
-        </select>
-        <span asp-validation-for="Estado" class="text-danger"></span>
-    </div>
-
-    <div class="form-group">
-        <label asp-for="Observaciones"></label>
-        <textarea asp-for="Observaciones" class="form-control"></textarea>
-    </div>
-
-    <button type="submit" class="btn btn-success">Guardar</button>
-    <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
-</form>
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

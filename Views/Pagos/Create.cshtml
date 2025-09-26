@@ -1,0 +1,143 @@
+@* @model ProyectoInmobiliariaADO.Models.Pago
+
+@{
+    ViewData["Title"] = "Registrar Pago";
+}
+
+<h1>Registrar Pago</h1>
+
+@if (ViewBag.Error != null)
+{
+    <div id="alertaError" class="alert alert-danger">@ViewBag.Error</div>
+    <script>
+        setTimeout(function() {
+            var alerta = document.getElementById("alertaError");
+            if (alerta) alerta.style.display = "none";
+        }, 3000);
+    </script>
+}
+
+<form asp-action="Create" method="post">
+    <div class="form-group">
+        <label asp-for="ContratoId">Contrato</label>
+        <select asp-for="ContratoId" class="form-control" asp-items="ViewBag.Contratos">
+            <option value="">Seleccione un contrato</option>
+        </select>
+        <span asp-validation-for="ContratoId" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Fecha"></label>
+        <input asp-for="Fecha" type="date" class="form-control" />
+        <span asp-validation-for="Fecha" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Importe"></label>
+        <input asp-for="Importe" class="form-control" step="0.01" min="0" />
+        <span asp-validation-for="Importe" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="MedioPago">Medio de Pago</label>
+        <select asp-for="MedioPago" class="form-control" asp-items="ViewBag.MediosPago">
+            <option value="">Seleccione medio de pago</option>
+        </select>
+        <span asp-validation-for="MedioPago" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Observaciones">Detalle</label>
+        <textarea asp-for="Observaciones" class="form-control" rows="3"></textarea>
+    </div>
+
+    <button type="submit" class="btn btn-success">Registrar</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+} *@
+
+
+@model ProyectoInmobiliariaADO.Models.Pago
+
+@{
+    ViewData["Title"] = "Registrar Pago";
+}
+
+@await Html.PartialAsync("_Navbar")
+
+<div class="container mt-4">
+    <h1 class="mb-4 text-primary">
+        <i class="bi bi-cash-stack"></i> Registrar Pago
+    </h1>
+
+    @if (ViewBag.Error != null)
+    {
+        <div id="alertaError" class="alert alert-danger">@ViewBag.Error</div>
+        <script>
+            setTimeout(function() {
+                var alerta = document.getElementById("alertaError");
+                if (alerta) alerta.style.display = "none";
+            }, 3000);
+        </script>
+    }
+
+    <div class="card shadow-lg border-0">
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0">Formulario de Pago</h4>
+        </div>
+        <div class="card-body">
+            <form asp-action="Create" method="post">
+
+                <div class="mb-3">
+                    <label asp-for="ContratoId" class="form-label fw-bold">Contrato</label>
+                    <select asp-for="ContratoId" class="form-select" asp-items="ViewBag.Contratos">
+                        <option value="">Seleccione un contrato</option>
+                    </select>
+                    <span asp-validation-for="ContratoId" class="text-danger"></span>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label asp-for="Fecha" class="form-label fw-bold">Fecha</label>
+                        <input asp-for="Fecha" type="date" class="form-control" />
+                        <span asp-validation-for="Fecha" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="Importe" class="form-label fw-bold">Importe</label>
+                        <input asp-for="Importe" class="form-control" step="0.01" min="0" placeholder="Ej: 15000.00" />
+                        <span asp-validation-for="Importe" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="MedioPago" class="form-label fw-bold">Medio de Pago</label>
+                    <select asp-for="MedioPago" class="form-select" asp-items="ViewBag.MediosPago">
+                        <option value="">Seleccione medio de pago</option>
+                    </select>
+                    <span asp-validation-for="MedioPago" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Observaciones" class="form-label fw-bold">Detalle</label>
+                    <textarea asp-for="Observaciones" class="form-control" rows="3" placeholder="Ingrese observaciones o comentarios"></textarea>
+                </div>
+
+                <div class="d-flex gap-2 mt-4">
+                    <button type="submit" class="btn btn-success">
+                        <i class="bi bi-save"></i> Registrar
+                    </button>
+                    <a asp-action="Index" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-left"></i> Volver
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

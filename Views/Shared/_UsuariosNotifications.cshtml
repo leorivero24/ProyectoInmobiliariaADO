@@ -1,0 +1,25 @@
+@if (TempData["Success"] != null)
+{
+    <div id="notification" class="alert alert-success fade show" role="alert">
+        @TempData["Success"]
+    </div>
+}
+
+@if (TempData["Error"] != null)
+{
+    <div id="notification" class="alert alert-danger fade show" role="alert">
+        @TempData["Error"]
+    </div>
+}
+
+@section Scripts {
+    <script>
+        setTimeout(function() {
+            const notification = document.getElementById('notification');
+            if (notification) {
+                const alertInstance = bootstrap.Alert.getOrCreateInstance(notification);
+                alertInstance.close();
+            }
+        }, 3000); // 3 segundos
+    </script>
+}

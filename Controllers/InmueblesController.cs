@@ -1,3 +1,4 @@
+
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using ProyectoInmobiliariaADO.Data;
@@ -9,16 +10,38 @@ namespace ProyectoInmobiliariaADO.Controllers
     {
         private readonly RepositorioInmueble repo = new RepositorioInmueble();
         private readonly RepositorioPropietario repoPropietario = new RepositorioPropietario();
+        private readonly RepositorioTipoInmueble repoTipo = new RepositorioTipoInmueble();
 
-        public IActionResult Index()
+        // GET: Index con filtros opcionales
+        public IActionResult Index(string filtro = "Todos", DateTime? fechaInicio = null, DateTime? fechaFin = null)
         {
             var lista = repo.ObtenerTodos();
-            // Orden personalizado por Estado
-            var estadosOrden = new List<string> { "Alquilado", "Reservado", "Disponible" };
+
+            // Filtrar disponibles por estado
+            if (filtro == "Disponibles")
+            {
+                lista = lista.Where(i => i.Estado == "Disponible").ToList();
+            }
+
+            // Filtrar por disponibilidad entre fechas
+            if (fechaInicio.HasValue && fechaFin.HasValue)
+            {
+                lista = repo.ObtenerTodos();
+                lista = repo.ObtenerDisponiblesEntreFechas(fechaInicio.Value, fechaFin.Value);
+                ViewBag.FechaInicio = fechaInicio.Value.ToString("yyyy-MM-dd");
+                ViewBag.FechaFin = fechaFin.Value.ToString("yyyy-MM-dd");
+                filtro = "PorFechas";
+            }
+
+            // Ordenar por estado
+            var estadosOrden = new List<string> { "Alquilado", "Disponible" };
             lista = lista.OrderBy(i => estadosOrden.IndexOf(i.Estado)).ToList();
+
+            ViewBag.Filtro = filtro;
             return View(lista);
         }
 
+        // GET: Detalles de inmueble
         public IActionResult Details(int id)
         {
             var m = repo.ObtenerPorId(id);
@@ -26,38 +49,41 @@ namespace ProyectoInmobiliariaADO.Controllers
             return View(m);
         }
 
-        // GET: Inmuebles/Create
+        // GET: Crear inmueble
         public IActionResult Create()
         {
             CargarPropietarios();
+            CargarTipos();
             return View();
         }
 
-        // POST: Inmuebles/Create
+        // POST: Crear inmueble
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Create(Inmueble inmueble)
         {
             if (ModelState.IsValid)
             {
+                inmueble.Estado = "Disponible";
                 repo.Alta(inmueble);
                 return RedirectToAction(nameof(Index));
             }
-            CargarPropietarios();
+            CargarPropietarios(inmueble.PropietarioId);
+            CargarTipos(inmueble.TipoId);
             return View(inmueble);
         }
 
-        // GET: Inmuebles/Edit/5
+        // GET: Editar inmueble
         public IActionResult Edit(int id)
         {
             var m = repo.ObtenerPorId(id);
             if (m == null) return NotFound();
-
             CargarPropietarios(m.PropietarioId);
+            CargarTipos(m.TipoId);
             return View(m);
         }
 
-        // POST: Inmuebles/Edit
+        // POST: Editar inmueble
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Edit(Inmueble inmueble)
@@ -68,39 +94,31 @@ namespace ProyectoInmobiliariaADO.Controllers
                 return RedirectToAction(nameof(Index));
             }
             CargarPropietarios(inmueble.PropietarioId);
+            CargarTipos(inmueble.TipoId);
             return View(inmueble);
         }
 
-        // GET: Inmuebles/Delete/5
+        // GET: Eliminar inmueble
         public IActionResult Delete(int id)
         {
             var inmueble = repo.ObtenerPorId(id);
             if (inmueble == null) return NotFound();
 
-            // Revisar si tiene contratos asociados
             var contratosRepo = new RepositorioContrato();
             var contratos = contratosRepo.ObtenerContratosPorInmueble(id);
 
-            if (contratos.Count > 0)
+            if (contratos.Count > 0 || inmueble.Estado == "Alquilado" || inmueble.Estado == "Reservado")
             {
-                // Guardamos mensaje en TempData para mostrarlo en la vista Index
-                TempData["ErrorEliminar"] = "No se puede eliminar el inmueble porque tiene contratos asociados.";
+                TempData["ErrorEliminar"] = "No se puede eliminar un inmueble que tenga contratos o esté alquilado/reservado.";
                 return RedirectToAction(nameof(Index));
             }
 
-            if (inmueble.Estado == "Alquilado" || inmueble.Estado == "Reservado")
-            {
-                TempData["ErrorEliminar"] = "No se puede eliminar un inmueble que esté alquilado o reservado.";
-                return RedirectToAction(nameof(Index));
-            }
-
-            // Si no tiene contratos, se elimina
             repo.Baja(id);
-            TempData["Success"] = "Inmueble eliminado correctamente.";
+            TempData["EliminarSuccess"] = "Inmueble eliminado correctamente.";
             return RedirectToAction(nameof(Index));
         }
 
-        // POST: Inmuebles/DeleteConfirmed
+        // POST: Confirmar eliminación
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public IActionResult DeleteConfirmed(int id)
@@ -109,7 +127,7 @@ namespace ProyectoInmobiliariaADO.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // Método privado para cargar lista de propietarios
+        // Cargar lista de propietarios para dropdown
         private void CargarPropietarios(int? propietarioIdSeleccionado = null)
         {
             var propietarios = repoPropietario.ObtenerTodos()
@@ -120,6 +138,13 @@ namespace ProyectoInmobiliariaADO.Controllers
                                 });
 
             ViewBag.Propietarios = new SelectList(propietarios, "Id", "NombreCompleto", propietarioIdSeleccionado);
+        }
+
+        // Cargar lista de tipos activos para dropdown
+        private void CargarTipos(int? tipoIdSeleccionado = null)
+        {
+            var tipos = repoTipo.ObtenerTodosActivos();
+            ViewBag.Tipos = new SelectList(tipos, "Id", "Descripcion", tipoIdSeleccionado);
         }
     }
 }

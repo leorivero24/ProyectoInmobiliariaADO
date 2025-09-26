@@ -1,0 +1,156 @@
+@* @model ProyectoInmobiliariaADO.Models.Pago
+
+@{
+    ViewData["Title"] = "Detalles del Pago";
+    bool esAdmin = User.IsInRole("Administrador");
+}
+
+@await Html.PartialAsync("_Navbar")
+
+<h1>Detalles del Pago</h1>
+
+<dl class="row">
+    <dt class="col-sm-2">Contrato</dt>
+    <dd class="col-sm-10">
+        @($"{Model.ContratoInmuebleDireccion} - {Model.ContratoInmuebleTipo} - {Model.ContratoInquilinoNombre} {Model.ContratoInquilinoApellido}")
+    </dd>
+
+    <dt class="col-sm-2">Fecha</dt>
+    <dd class="col-sm-10">@Model.Fecha.ToShortDateString()</dd>
+
+    <dt class="col-sm-2">Importe</dt>
+    <dd class="col-sm-10">$@Model.Importe</dd>
+
+    <dt class="col-sm-2">Medio de Pago</dt>
+    <dd class="col-sm-10">@Model.MedioPago</dd>
+
+    <dt class="col-sm-2">Observaciones</dt>
+    <dd class="col-sm-10">@Model.Observaciones</dd>
+
+    <dt class="col-sm-2">Estado</dt>
+    <dd class="col-sm-10">@Model.Estado</dd>
+</dl>
+
+@if (esAdmin)
+{
+    <hr />
+    <h3>Auditoría</h3>
+    <table class="table table-bordered w-50">
+        <tr>
+            <th>Acción</th>
+            <th>Usuario</th>
+            <th>Fecha</th>
+        </tr>
+        <tr>
+            <td>Creación</td>
+            <td>@Model.UsuarioCreacionPago</td>
+            <td>@Model.FechaCreacionPago?.ToString("g")</td>
+        </tr>
+        @if (Model.Estado == "Anulado")
+        {
+            <tr>
+                <td>Anulación</td>
+                <td>@Model.UsuarioAnulacionPago</td>
+                <td>@Model.FechaAnulacionPago?.ToString("g")</td>
+            </tr>
+        }
+    </table>
+}
+
+<p>
+    <a asp-action="Index" class="btn btn-secondary">Volver</a>
+</p> *@
+
+@model ProyectoInmobiliariaADO.Models.Pago
+
+@{
+    ViewData["Title"] = "Detalles del Pago";
+}
+
+<div class="container mt-4">
+    <h1 class="mb-4 text-primary"><i class="bi bi-cash-stack"></i> Detalles del Pago</h1>
+
+    <div class="card shadow-lg mb-4 border-0">
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0">Información del Pago</h4>
+        </div>
+        <div class="card-body">
+            <dl class="row">
+                <dt class="col-sm-3 fw-bold text-secondary">Contrato</dt>
+                <dd class="col-sm-9">
+                    @($"{Model.ContratoInmuebleDireccion} - {Model.ContratoInmuebleTipo} - {Model.ContratoInquilinoNombre} {Model.ContratoInquilinoApellido}")
+                </dd>
+
+                <dt class="col-sm-3 fw-bold text-secondary">Fecha</dt>
+                <dd class="col-sm-9">@Model.Fecha.ToString("g")</dd>
+
+                <dt class="col-sm-3 fw-bold text-secondary">Importe</dt>
+                <dd class="col-sm-9 text-success fw-bold">$@Model.Importe</dd>
+
+                <dt class="col-sm-3 fw-bold text-secondary">Medio de Pago</dt>
+                <dd class="col-sm-9">@Model.MedioPago</dd>
+
+                <dt class="col-sm-3 fw-bold text-secondary">Observaciones</dt>
+                <dd class="col-sm-9">@Model.Observaciones</dd>
+
+                <dt class="col-sm-3 fw-bold text-secondary">Estado</dt>
+                <dd class="col-sm-9">
+                    @if (Model.Estado == "Activo")
+                    {
+                        <span class="badge bg-success">Activo</span>
+                    }
+                    else if (Model.Estado == "Anulado")
+                    {
+                        <span class="badge bg-danger">Anulado</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-secondary">@Model.Estado</span>
+                    }
+                </dd>
+            </dl>
+        </div>
+    </div>
+
+    @* Auditoría solo si es administrador *@
+    @if (User.IsInRole("Administrador"))
+    {
+        <div class="card shadow-lg mb-4 border-0">
+            <div class="card-header bg-dark text-white">
+                <h4 class="mb-0">Auditoría</h4>
+            </div>
+            <div class="card-body p-0">
+                <table class="table table-hover table-bordered align-middle mb-0">
+                    <thead class="table-secondary">
+                        <tr>
+                            <th>Acción</th>
+                            <th>Usuario</th>
+                            <th>Fecha</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="table-success">
+                            <td>Creación</td>
+                            <td>@Model.UsuarioCreacionPago</td>
+                            <td>@(Model.FechaCreacionPago.HasValue ? Model.FechaCreacionPago.Value.ToString("g") : "")</td>
+                        </tr>
+                        @if (Model.Estado == "Anulado")
+                        {
+                            <tr class="table-danger">
+                                <td>Anulación</td>
+                                <td>@Model.UsuarioAnulacionPago</td>
+                                <td>@(Model.FechaAnulacionPago.HasValue ? Model.FechaAnulacionPago.Value.ToString("g") : "")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+
+    <div class="d-flex gap-2">
+        <a asp-action="Index" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Volver
+        </a>
+    </div>
+</div>

@@ -4,7 +4,8 @@ namespace ProyectoInmobiliariaADO.Models
     {
         public int Id { get; set; }
         public string Direccion { get; set; } = string.Empty;
-        public string Tipo { get; set; } = string.Empty;
+        public int TipoId { get; set; }   // FK hacia TipoInmueble
+        public TipoInmueble? Tipo { get; set; } // Navegación al objeto TipoInmueble
         public int Ambientes { get; set; }
         public decimal Superficie { get; set; }
         public decimal Precio { get; set; }

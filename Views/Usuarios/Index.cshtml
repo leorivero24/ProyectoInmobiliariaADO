@@ -1,0 +1,88 @@
+@model IEnumerable<ProyectoInmobiliariaADO.Models.Usuario>
+
+@{
+    ViewData["Title"] = "Usuarios";
+}
+
+@await Html.PartialAsync("_Navbar")
+
+<h1>Usuarios</h1>
+
+@await Html.PartialAsync("_UsuariosNotifications")
+
+
+
+
+@section Scripts {
+    <script>
+        setTimeout(function () {
+            const notification = document.getElementById('notification');
+            if (notification) {
+                notification.style.transition = "opacity 0.5s ease";
+                notification.style.opacity = "0";
+                setTimeout(() => notification.remove(), 500);
+            }
+        }, 3000); // 3 segundos
+    </script>
+}
+
+
+
+
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">Nuevo Usuario</a>
+</p>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Nombre</th>
+            <th>Email</th>
+            <th>Rol</th>
+            <th>Activo</th>
+            <th>Fecha Creación</th>
+            <th>Último Login</th>
+            <th>Avatar</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var usuario in Model)
+        {
+            <tr>
+                <td>@usuario.Id</td>
+                <td>@usuario.Nombre</td>
+                <td>@usuario.Email</td>
+                <td>@usuario.Rol</td>
+                <td>@(usuario.Activo ? "Sí" : "No")</td>
+                <td>@usuario.FechaCreacion.ToString("dd/MM/yyyy")</td>
+                <td>@(usuario.FechaUltimoLogin?.ToString("dd/MM/yyyy HH:mm") ?? "-")</td>
+                <td>
+                    @if (!string.IsNullOrEmpty(usuario.Avatar))
+                    {
+                        <img src="~/uploads/@usuario.Avatar" alt="Avatar" width="50" height="50" class="rounded-circle" />
+                    }
+                    else
+                    {
+                        <span>-</span>
+                    }
+                </td>
+                <td>
+                    <a asp-action="Details" asp-route-id="@usuario.Id" class="btn btn-info btn-sm me-1">Detalles</a>
+                    <a asp-action="Edit" asp-route-id="@usuario.Id" class="btn btn-warning btn-sm me-1">Editar</a>
+
+                    <form asp-action="Delete" asp-route-id="@usuario.Id" method="post" style="display:inline">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn btn-danger btn-sm">Baja</button>
+                    </form>
+                    <form asp-action="Eliminar" asp-route-id="@usuario.Id" method="post" style="display:inline">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn btn-outline-danger btn-sm">Eliminar</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
