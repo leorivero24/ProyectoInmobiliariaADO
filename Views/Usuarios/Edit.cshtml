@@ -17,39 +17,42 @@
             <h4 class="mb-0">Formulario de Edición</h4>
         </div>
         <div class="card-body">
-            <form asp-action="Edit" method="post" enctype="multipart/form-data">
+            <form asp-action="Edit" method="post" enctype="multipart/form-data" novalidate>
                 @Html.AntiForgeryToken()
                 <input type="hidden" asp-for="Id" />
 
+                <!-- Nombre -->
                 <div class="mb-3">
                     <label asp-for="Nombre" class="form-label fw-bold"></label>
-                    <input asp-for="Nombre" class="form-control" placeholder="Ingrese el nombre" />
-                    <span asp-validation-for="Nombre" class="text-danger"></span>
+                    @* Deshabilitamos la validación automática *@
+                    <input asp-for="Nombre" class="form-control" placeholder="Ingrese el nombre" data-val="false" />
                 </div>
 
+                <!-- Email -->
                 <div class="mb-3">
                     <label asp-for="Email" class="form-label fw-bold"></label>
-                    <input asp-for="Email" class="form-control" placeholder="ejemplo@email.com" />
-                    <span asp-validation-for="Email" class="text-danger"></span>
+                    <input asp-for="Email" class="form-control" placeholder="ejemplo@email.com" data-val="false" />
                 </div>
 
+                <!-- Nueva contraseña -->
                 <div class="mb-3">
                     <label asp-for="PasswordHash" class="form-label fw-bold">Nueva Contraseña</label>
-                    <input asp-for="PasswordHash" class="form-control" type="password" placeholder="Ingrese nueva contraseña" />
-                    <span asp-validation-for="PasswordHash" class="text-danger"></span>
+                    <input asp-for="PasswordHash" class="form-control" type="password" placeholder="Ingrese nueva contraseña" data-val="false" />
                 </div>
 
+                <!-- Rol (solo admin) -->
                 @if (esAdmin)
                 {
                     <div class="mb-3">
                         <label asp-for="Rol" class="form-label fw-bold">Rol</label>
-                        <select asp-for="Rol" class="form-select" asp-items="ViewBag.Roles"></select>
+                        <select asp-for="Rol" class="form-select" asp-items="ViewBag.Roles" data-val="false"></select>
                     </div>
                 }
 
+                <!-- Avatar -->
                 <div class="mb-3">
                     <label class="form-label fw-bold">Avatar</label>
-                    <input type="file" name="AvatarFile" class="form-control" />
+                    <input type="file" name="AvatarFile" class="form-control" data-val="false" />
                     @if (!string.IsNullOrEmpty(Model.Avatar))
                     {
                         <div class="mt-2">
@@ -62,6 +65,7 @@
                     }
                 </div>
 
+                <!-- Botones -->
                 <div class="d-flex gap-2 mt-4">
                     <button type="submit" class="btn btn-success">
                         <i class="bi bi-save"></i> Guardar
@@ -76,5 +80,10 @@
 </div>
 
 @section Scripts{
-    <partial name="_ValidationScriptsPartial" />
+    @* Evitar que jQuery Validation bloquee campos vacíos *@
+    <script>
+        $(function () {
+            $("form").removeData("validator").removeData("unobtrusiveValidation");
+        });
+    </script>
 }
