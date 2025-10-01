@@ -1,9 +1,11 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ProyectoInmobiliariaADO.Data;
 using ProyectoInmobiliariaADO.Models;
 
 namespace ProyectoInmobiliariaADO.Controllers
 {
+    [Authorize] // Requiere autenticación para acceder a todo el controlador
     public class PropietariosController : Controller
     {
         private readonly RepositorioPropietario repo = new RepositorioPropietario();
@@ -16,6 +18,7 @@ namespace ProyectoInmobiliariaADO.Controllers
         }
 
         // GET: Propietarios/Create
+        [Authorize(Roles = "Administrador,Empleado")]
         public IActionResult Create()
         {
             return View();
@@ -24,11 +27,11 @@ namespace ProyectoInmobiliariaADO.Controllers
         // POST: Propietarios/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Administrador,Empleado")]
         public IActionResult Create(Propietario propietario)
         {
             if (ModelState.IsValid)
             {
-                // Validar que no exista DNI duplicado
                 var existente = repo.ObtenerPorDNI(propietario.DNI);
                 if (existente != null)
                 {
@@ -43,6 +46,7 @@ namespace ProyectoInmobiliariaADO.Controllers
         }
 
         // GET: Propietarios/Edit/5
+        [Authorize(Roles = "Administrador,Empleado")]
         public IActionResult Edit(int id)
         {
             var propietario = repo.ObtenerPorId(id);
@@ -53,11 +57,11 @@ namespace ProyectoInmobiliariaADO.Controllers
         // POST: Propietarios/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Administrador,Empleado")]
         public IActionResult Edit(Propietario propietario)
         {
             if (ModelState.IsValid)
             {
-                // Validar que el DNI no esté duplicado en otro registro
                 var existente = repo.ObtenerPorDNI(propietario.DNI);
                 if (existente != null && existente.Id != propietario.Id)
                 {
@@ -72,6 +76,7 @@ namespace ProyectoInmobiliariaADO.Controllers
         }
 
         // GET: Propietarios/Delete/5
+        [Authorize(Roles = "Administrador")]
         public IActionResult Delete(int id)
         {
             var propietario = repo.ObtenerPorId(id);
@@ -82,6 +87,7 @@ namespace ProyectoInmobiliariaADO.Controllers
         // POST: Propietarios/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Administrador")]
         public IActionResult DeleteConfirmed(int id)
         {
             repo.Baja(id);

@@ -1,8 +1,6 @@
-
 using Microsoft.AspNetCore.Authentication.Cookies;
 
 var builder = WebApplication.CreateBuilder(args);
-
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
@@ -12,8 +10,20 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
     .AddCookie(options =>
     {
         options.LoginPath = "/Account/Login";        // Página de login
-        options.AccessDeniedPath = "/Account/Login"; // Redirige si no tiene acceso
+        options.AccessDeniedPath = "/Account/AccessDenied"; // Mejor usar AccessDenied
     });
+
+// --- AGREGAR AUTORIZACIÓN Y POLICY ---
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("EliminarEmpleados", policy =>
+        policy.RequireAssertion(context =>
+        {
+            // Solo administradores pueden eliminar empleados
+            return context.User.IsInRole("Administrador");
+        })
+    );
+});
 
 var app = builder.Build();
 
@@ -37,7 +47,7 @@ app.MapStaticAssets();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Account}/{action=Login}/{id?}") // Cambiado a Login
+    pattern: "{controller=Account}/{action=Login}/{id?}")
     .WithStaticAssets();
 
 app.Run();

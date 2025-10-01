@@ -1,4 +1,4 @@
-
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using ProyectoInmobiliariaADO.Data;
@@ -7,6 +7,7 @@ using System.Linq;
 
 namespace ProyectoInmobiliariaADO.Controllers
 {
+    [Authorize] // Solo usuarios autenticados pueden acceder a este controlador
     public class InquilinosController : Controller
     {
         private readonly RepositorioInquilino repo;
@@ -24,15 +25,17 @@ namespace ProyectoInmobiliariaADO.Controllers
         }
 
         // Crear inquilino (GET)
+        [Authorize(Roles = "Administrador,Empleado")]
         public IActionResult Create()
         {
-            CargarInquilinos(); // Carga dropdown con Apellido, Nombre y DNI
+            CargarInquilinos();
             return View();
         }
 
         // Crear inquilino (POST)
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Administrador,Empleado")]
         public IActionResult Create(Inquilino inquilino)
         {
             if (repo.ObtenerPorDNI(inquilino.DNI) != null)
@@ -44,7 +47,7 @@ namespace ProyectoInmobiliariaADO.Controllers
 
             if (ModelState.IsValid)
             {
-                repo.Alta(inquilino); // INSERT
+                repo.Alta(inquilino);
                 return RedirectToAction(nameof(Index));
             }
 
@@ -53,6 +56,7 @@ namespace ProyectoInmobiliariaADO.Controllers
         }
 
         // Editar inquilino (GET)
+        [Authorize(Roles = "Administrador,Empleado")]
         public IActionResult Edit(int id)
         {
             var i = repo.ObtenerPorId(id);
@@ -64,6 +68,7 @@ namespace ProyectoInmobiliariaADO.Controllers
         // Editar inquilino (POST)
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Administrador,Empleado")]
         public IActionResult Edit(int id, Inquilino inquilino)
         {
             if (id != inquilino.Id) return NotFound();
@@ -78,7 +83,7 @@ namespace ProyectoInmobiliariaADO.Controllers
 
             if (ModelState.IsValid)
             {
-                repo.Modificacion(inquilino); // UPDATE
+                repo.Modificacion(inquilino);
                 return RedirectToAction(nameof(Index));
             }
 
@@ -87,6 +92,7 @@ namespace ProyectoInmobiliariaADO.Controllers
         }
 
         // Eliminar inquilino (GET)
+        [Authorize(Roles = "Administrador")]
         public IActionResult Delete(int id)
         {
             var i = repo.ObtenerPorId(id);
@@ -97,9 +103,10 @@ namespace ProyectoInmobiliariaADO.Controllers
         // Eliminar inquilino (POST)
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Administrador")]
         public IActionResult DeleteConfirmed(int id)
         {
-            repo.Baja(id); // DELETE
+            repo.Baja(id);
             return RedirectToAction(nameof(Index));
         }
 

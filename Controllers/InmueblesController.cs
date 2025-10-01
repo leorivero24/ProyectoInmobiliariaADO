@@ -1,4 +1,4 @@
-
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using ProyectoInmobiliariaADO.Data;
@@ -6,6 +6,7 @@ using ProyectoInmobiliariaADO.Models;
 
 namespace ProyectoInmobiliariaADO.Controllers
 {
+    [Authorize] // Solo usuarios autenticados pueden acceder a este controlador
     public class InmueblesController : Controller
     {
         private readonly RepositorioInmueble repo = new RepositorioInmueble();
@@ -17,23 +18,17 @@ namespace ProyectoInmobiliariaADO.Controllers
         {
             var lista = repo.ObtenerTodos();
 
-            // Filtrar disponibles por estado
             if (filtro == "Disponibles")
-            {
                 lista = lista.Where(i => i.Estado == "Disponible").ToList();
-            }
 
-            // Filtrar por disponibilidad entre fechas
             if (fechaInicio.HasValue && fechaFin.HasValue)
             {
-                lista = repo.ObtenerTodos();
                 lista = repo.ObtenerDisponiblesEntreFechas(fechaInicio.Value, fechaFin.Value);
                 ViewBag.FechaInicio = fechaInicio.Value.ToString("yyyy-MM-dd");
                 ViewBag.FechaFin = fechaFin.Value.ToString("yyyy-MM-dd");
                 filtro = "PorFechas";
             }
 
-            // Ordenar por estado
             var estadosOrden = new List<string> { "Alquilado", "Disponible" };
             lista = lista.OrderBy(i => estadosOrden.IndexOf(i.Estado)).ToList();
 
@@ -49,7 +44,8 @@ namespace ProyectoInmobiliariaADO.Controllers
             return View(m);
         }
 
-        // GET: Crear inmueble
+        // --- Crear inmueble ---
+        [Authorize(Roles = "Administrador,Empleado")]
         public IActionResult Create()
         {
             CargarPropietarios();
@@ -57,9 +53,9 @@ namespace ProyectoInmobiliariaADO.Controllers
             return View();
         }
 
-        // POST: Crear inmueble
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Administrador,Empleado")]
         public IActionResult Create(Inmueble inmueble)
         {
             if (ModelState.IsValid)
@@ -73,7 +69,8 @@ namespace ProyectoInmobiliariaADO.Controllers
             return View(inmueble);
         }
 
-        // GET: Editar inmueble
+        // --- Editar inmueble ---
+        [Authorize(Roles = "Administrador,Empleado")]
         public IActionResult Edit(int id)
         {
             var m = repo.ObtenerPorId(id);
@@ -83,9 +80,9 @@ namespace ProyectoInmobiliariaADO.Controllers
             return View(m);
         }
 
-        // POST: Editar inmueble
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Administrador,Empleado")]
         public IActionResult Edit(Inmueble inmueble)
         {
             if (ModelState.IsValid)
@@ -98,7 +95,8 @@ namespace ProyectoInmobiliariaADO.Controllers
             return View(inmueble);
         }
 
-        // GET: Eliminar inmueble
+        // --- Eliminar inmueble ---
+        [Authorize(Roles = "Administrador")]
         public IActionResult Delete(int id)
         {
             var inmueble = repo.ObtenerPorId(id);
@@ -118,16 +116,16 @@ namespace ProyectoInmobiliariaADO.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // POST: Confirmar eliminación
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Administrador")]
         public IActionResult DeleteConfirmed(int id)
         {
             repo.Baja(id);
             return RedirectToAction(nameof(Index));
         }
 
-        // Cargar lista de propietarios para dropdown
+        // Métodos privados
         private void CargarPropietarios(int? propietarioIdSeleccionado = null)
         {
             var propietarios = repoPropietario.ObtenerTodos()
@@ -140,7 +138,6 @@ namespace ProyectoInmobiliariaADO.Controllers
             ViewBag.Propietarios = new SelectList(propietarios, "Id", "NombreCompleto", propietarioIdSeleccionado);
         }
 
-        // Cargar lista de tipos activos para dropdown
         private void CargarTipos(int? tipoIdSeleccionado = null)
         {
             var tipos = repoTipo.ObtenerTodosActivos();

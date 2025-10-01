@@ -1,10 +1,11 @@
-
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ProyectoInmobiliariaADO.Models;
 using ProyectoInmobiliariaADO.Data;
 
 namespace ProyectoInmobiliariaADO.Controllers
 {
+    [Authorize] // Solo usuarios autenticados
     public class TipoInmuebleController : Controller
     {
         private readonly RepositorioTipoInmueble repo = new RepositorioTipoInmueble();
@@ -12,7 +13,7 @@ namespace ProyectoInmobiliariaADO.Controllers
         // GET: TipoInmueble
         public IActionResult Index()
         {
-            var lista = repo.ObtenerTodosActivos(); // Solo activos
+            var lista = repo.ObtenerTodosActivos();
             return View(lista);
         }
 
@@ -25,6 +26,7 @@ namespace ProyectoInmobiliariaADO.Controllers
         }
 
         // GET: TipoInmueble/Create
+        [Authorize(Roles = "Administrador,Empleado")]
         public IActionResult Create()
         {
             return View();
@@ -33,6 +35,7 @@ namespace ProyectoInmobiliariaADO.Controllers
         // POST: TipoInmueble/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Administrador,Empleado")]
         public IActionResult Create(TipoInmueble tipo)
         {
             if (ModelState.IsValid)
@@ -45,6 +48,7 @@ namespace ProyectoInmobiliariaADO.Controllers
         }
 
         // GET: TipoInmueble/Edit/5
+        [Authorize(Roles = "Administrador,Empleado")]
         public IActionResult Edit(int id)
         {
             var tipo = repo.ObtenerPorId(id);
@@ -55,6 +59,7 @@ namespace ProyectoInmobiliariaADO.Controllers
         // POST: TipoInmueble/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Administrador,Empleado")]
         public IActionResult Edit(TipoInmueble tipo)
         {
             if (ModelState.IsValid)
@@ -67,18 +72,18 @@ namespace ProyectoInmobiliariaADO.Controllers
         }
 
         // GET: TipoInmueble/Delete/5
+        [Authorize(Roles = "Administrador")]
         public IActionResult Delete(int id)
         {
             var tipo = repo.ObtenerPorId(id);
             if (tipo == null) return NotFound();
-
-            // Confirmación de eliminación
             return View(tipo);
         }
 
         // POST: TipoInmueble/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Administrador")]
         public IActionResult DeleteConfirmed(int id)
         {
             var tipo = repo.ObtenerPorId(id);
@@ -91,7 +96,7 @@ namespace ProyectoInmobiliariaADO.Controllers
             else
             {
                 repo.Baja(id);
-                TempData["Error"] = "Tipo de inmueble eliminado correctamente.";
+                TempData["Success"] = "Tipo de inmueble eliminado correctamente.";
             }
 
             return RedirectToAction(nameof(Index));
